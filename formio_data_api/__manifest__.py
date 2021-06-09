@@ -13,7 +13,7 @@
     'depends': ['formio', 'mail'],
     'data': [],
     'external_dependencies': {
-        'python': ['formio-data'],
+        'python': ['formiodata'],
     },
     'application': False,
     'images': [

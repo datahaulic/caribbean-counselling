@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="res_users_zoom_setting_id" model="ir.ui.view">
+            <field name="name">res.users.zoom.meet</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[2]" position="after">
+                     <page string="Zoom Meet">
+                          <div class="row">
+                              <div class="col-md-4" align="center">
+								    <button string='Authenticate' type="object" name="Authenticate"
+									class="oe_highlight" icon="fa-plug" />
+                              </div>
+                              <div class="col-md-4" align="center">
+                                    <button string='Refresh Token' type="object" name="refresh_token_from_access_token"
+                                    class="oe_highlight" icon="fa-refresh" />
+                              </div>
+                          </div>
+                       <group string="Credentials">
+                            <field name="zoom_client_id" />
+                            <field name="zoom_client_secret" />
+                            <field name="zoom_auth_base_url" />
+                            <field name="zoom_access_token_url" />
+                            <field name="zoom_request_token_url" />
+                            <field name="zoom_auth_code"/>
+                            <field name="zoom_access_token"
+                                class="customwrapclass"
+                                style="width:900px;" />
+                            <field name="zoom_refresh_token"
+                            class="customwrapclass"
+                            style="width:900px;" />
+                        <field name="outgoing_server_mail_id" />
+                       </group>
+                     </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

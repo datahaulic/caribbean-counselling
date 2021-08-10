@@ -56,7 +56,6 @@ class Res_Users(models.Model):
             and grant type is refresh_token,
             This token will be long lived.
         '''
-        # print("\n\nrefresh_token_from_access_token")
         if not self.zoom_refresh_token:
             raise UserError("Please authenticate first.")
         payload = {}
@@ -69,10 +68,7 @@ class Res_Users(models.Model):
         zoom_access_token_url = self.sanitize_data(self.zoom_access_token_url)
 
         combine = zoom_client_id + ':' + zoom_client_secret
-        # print("\n\ncombine: ", combine.encode())
-        # print('\n\nstirng', (base64.b64encode(combine.encode())))
         userAndPass = base64.b64encode(combine.encode()).decode("ascii")
-        # print('\n commfd ', userAndPass)
 
         headers = {'Authorization': 'Basic {}'.format(userAndPass)}
 
@@ -80,27 +76,26 @@ class Res_Users(models.Model):
             'grant_type': 'refresh_token',
             'refresh_token': zoom_refresh_token,
         }
-        # print("\n\npayload: ", payload, "\t\t\t\tzoom_access_token_url: ", zoom_access_token_url,
-        #       "\t\theaders: ", headers)
-        refresh_token_response = requests.request("POST", zoom_access_token_url, headers=headers, data=payload)
-        # print(refresh_token_response.text.encode('utf8'))
-        # print("\n\nrefresh_token_response: ", refresh_token_response.text)
-        if refresh_token_response.status_code == 200:
-            # print("\n\nIn refresh_token_from_access_token status code")
+        try:
+            refresh_token_response = requests.request("POST", zoom_access_token_url, headers=headers, data=payload)
 
-            try:
-                # try getting JSON repr of it
-                parsed_response = refresh_token_response.json()
-                if 'access_token' in parsed_response:
-                    _logger.info("REFRESHING ACCESS TOKEN {}".format(parsed_response.get('access_token')))
-                    self.zoom_access_token = parsed_response.get('access_token')
-                    self.zoom_refresh_token = parsed_response.get('refresh_token')
-            except Exception as ex:
-                raise Warning("EXCEPTION : {}".format(ex))
-        elif refresh_token_response.status_code == 401:
-            _logger.error("Access token/refresh token is expired")
-        else:
-            raise Warning("We got a issue !!!! Desc : {}".format(refresh_token_response.text))
+            if refresh_token_response.status_code == 200:
+
+                try:
+                    # try getting JSON repr of it
+                    parsed_response = refresh_token_response.json()
+                    if 'access_token' in parsed_response:
+                        _logger.info("REFRESHING ACCESS TOKEN {}".format(parsed_response.get('access_token')))
+                        self.zoom_access_token = parsed_response.get('access_token')
+                        self.zoom_refresh_token = parsed_response.get('refresh_token')
+                except Exception as ex:
+                    raise Warning("EXCEPTION : {}".format(ex))
+            elif refresh_token_response.status_code == 401:
+                _logger.error("Access token/refresh token is expired")
+            else:
+                raise Warning("We got a issue !!!! Desc : {}".format(refresh_token_response.text))
+        except Exception as e:
+            _logger.error(_("Error : %s"%e))
 
     def sanitize_data(self, field_to_sanitize):
         '''
@@ -128,6 +123,5 @@ class Res_Users(models.Model):
             for user in user_id:
                 if user.zoom_refresh_token:
                     user.refresh_token_from_access_token()
-                    # print(user.name,'Inside refresh Token by schedulars.....!',)
                 else:
                     _logger.warning('Please Authenticate for User %s' % user.name)

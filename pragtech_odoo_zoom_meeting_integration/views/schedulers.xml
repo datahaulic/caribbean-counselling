@@ -25,21 +25,6 @@
 			<field name="active" eval="True" />
 		</record>
 
-
-
-		
-<!--		<record id="cron_zoom_authentication_from_company_refresh_token" model="ir.cron">-->
-<!--			<field name="name">Zoom Referesh token</field>-->
-<!--			<field name="model_id" ref="model_res_company" />-->
-<!--			<field name="state">code</field>-->
-<!--			<field name="code">model.refresh_token_from_access_token()</field>-->
-<!--			<field name="interval_number">1</field>-->
-<!--			<field name="interval_type">hours</field>-->
-<!--			<field name="numbercall">-1</field>-->
-<!--			<field name="doall" eval="False" />-->
-<!--			<field name="active" eval="True" />-->
-<!--		</record>-->
-
 	 <record id="ir_cron_authenticate_user_zoom" model="ir.cron">
          <field name="name">Zoom Auth Refresh Users</field>
          <field name="model_id" ref="model_res_users"/>

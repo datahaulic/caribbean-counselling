@@ -19,7 +19,6 @@ class ResCompany(models.Model):
         date = str(datetime.strptime("1870-01-01 00:00:00", "%Y-%m-%d %H:%M:%S"))
         return datetime.strptime("1870-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
 
-    #
     # Company level Zoom Configuration fields
     zoom_client_id = fields.Char(help="The client ID you obtain from the developer dashboard.", string="Consumer Key")
     zoom_client_secret = fields.Char(help="The client secret you obtain from the developer dashboard.",
@@ -31,6 +30,7 @@ class ResCompany(models.Model):
                                         help="Exchange code for refresh and access tokens")
     zoom_request_token_url = fields.Char('Redirect URL', default="http://localhost:8069/get_auth_code_company",
                                          help="One of the redirect URIs listed for this project in the developer dashboard.")
+
     # used for api calling, generated during authorization process.
     zoom_auth_code = fields.Char('Auth Code', help="")
     zoom_access_token = fields.Char('Access Token', help="The token that must be used to access the ZOOM API.")
@@ -67,7 +67,7 @@ class ResCompany(models.Model):
             and grant type is refresh_token,
             This token will be long lived.
         """
-        # print("\n\nrefresh_token_from_access_token")
+        # print("\n\n Refresh Token :")
         if not self.zoom_refresh_token:
             raise UserError(_("Please authenticate first."))
         payload = {}
@@ -80,9 +80,7 @@ class ResCompany(models.Model):
         zoom_access_token_url = self.sanitize_data(self.zoom_access_token_url)
 
         combine = zoom_client_id + ':' + zoom_client_secret
-        # print("\n\ncombine: ",combine)
         userAndPass = base64.b64encode(combine.encode()).decode("ascii")
-        # print('\n commfd ', userAndPass)
 
         headers = {'Authorization': 'Basic {}'.format(userAndPass)}
 
@@ -90,14 +88,11 @@ class ResCompany(models.Model):
             'grant_type': 'refresh_token',
             'refresh_token': zoom_refresh_token,
         }
-        # print("\n\npayload: ",payload,"\t\t\t\tzoom_access_token_url: ",zoom_access_token_url,"\t\theaders: ",headers)
+        # print("\n\n Payload: ",payload,"\t\t\t\tZoom Access Token Url: ",zoom_access_token_url,"\t\tHeaders: ",headers)
         refresh_token_response = requests.request("POST", zoom_access_token_url, headers=headers, data=payload)
-        # print(refresh_token_response.text.encode('utf8'))
-        # print("\n\nrefresh_token_response: ",refresh_token_response.text)
+        # print("\n\n Refresh Token Response: ",refresh_token_response.text)
         if refresh_token_response.status_code == 200:
-            # print("\n\nIn refresh_token_from_access_token status code")
             try:
-                # try getting JSON repr of it
                 parsed_response = refresh_token_response.json()
                 if 'access_token' in parsed_response:
                     _logger.info("REFRESHING ACCESS TOKEN {}".format(parsed_response.get('access_token')))
@@ -124,7 +119,6 @@ class ResCompany(models.Model):
         try:
             if self.zoom_client_id or self.zoom_request_token_url:
                 url = self.zoom_auth_base_url + '?&response_type=code&client_id=' + self.zoom_client_id + '&redirect_uri=' + self.zoom_request_token_url
-                print("\n\n\nurl:::::::::", url)
                 return {
                     "type": "ir.actions.act_url",
                     "url": url,
